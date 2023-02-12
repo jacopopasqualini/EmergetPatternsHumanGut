@@ -27,7 +27,6 @@ configurations/consistency/*
 data/JKR2meta/kaiju_UHGG_table.csv
 data/JKR2meta/kaiju_corePFAM_table.csv
 data/JKR2meta/kraken_RefSeq_table.csv
-data/metadata/aggregated/.*
 data/metadata/franzosa
 data/metadata/hmp2
 data/metadata/mars
