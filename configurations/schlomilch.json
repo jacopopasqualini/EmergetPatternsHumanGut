@@ -1,0 +1,20 @@
+{"data": {
+    "engine":"kaiju",
+    "phenotype":"diagnosis",
+    "database":"RefSeq",
+    "protocol":"relative_abundance",
+    "scale":"original",
+    "cuts":[1e-06,1e-05,5e-05,1e-04]},
+
+"model":{
+    "name":"schlomilch",
+    "opts":{
+        "mad":"fit",
+        "mad_model":"log-laplace",
+        "mad_scale":"relative",
+        "scaling_family":"taylor",
+        "taylor":"fit"},
+    "replicas":50,
+    "folder":"results/schlomilchRefSeqDiagnosis"
+    }
+}
