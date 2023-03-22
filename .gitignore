@@ -12,7 +12,6 @@ plots/mad/*
 plots/occupancy/
 plots/rarefaction/*
 plots/sad/*
-plots/maintext/*.png
 results/cricket/*
 results/easter/*
 results/easter/mid*
@@ -37,3 +36,4 @@ data/observables
 data/configurations
 ##############################
 ### DELETE SECTION
+plots/maintext/*
