@@ -36,3 +36,7 @@ data/observables
 data/configurations
 ##############################
 ### DELETE SECTION
+workflow/maintext/sad_every.py
+workflow/maintext/sad_whole.py
+workflow/maintext/sad_original.py
+workflow/maintext/rarefaction.py
