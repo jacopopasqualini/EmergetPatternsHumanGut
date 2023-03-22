@@ -36,3 +36,4 @@ data/observables
 data/configurations
 ##############################
 ### DELETE SECTION
+workflow/maintext.ao.py
