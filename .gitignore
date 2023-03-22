@@ -30,7 +30,6 @@ data/JKR2meta/kraken_RefSeq_table.csv
 data/metadata/franzosa
 data/metadata/hmp2
 data/metadata/mars
-data/metadata/aggregated/metadata_db.csv
 data/metadata/aggregated/run2.txt
 data/model
 data/observables
