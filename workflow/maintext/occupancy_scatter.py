@@ -28,7 +28,7 @@ import plot_config
 
 config_file = sys.argv[1]
 
-with open(f'../../data/configurations/{config_file}.json') as json_file: 
+with open(f'../../configurations/{config_file}.json') as json_file: 
     
     config = json.load(json_file)
 
@@ -41,11 +41,19 @@ protocol = data_config['protocol']
 scale    = data_config['scale'] 
 cuts     = data_config['cuts']
 
-SCH_OBS_DIR = os.path.join('../../data/model','schlomilch','observables',f'{engine}_{database}_{phen}')
+SCH_OBS_DIR = os.path.join('../../results','schlomilchRefSeqDiagnosis','observables')
 SCH_MOD_DIR = 'schlomilch'
 
-DRC_OBS_DIR = os.path.join('../../data/model','dirichlet','observables',f'{engine}_{database}_{phen}')
+CRI_OBS_DIR = os.path.join('../../results','CricketRefSeqDiagnosis','observables')
+CRI_MOD_DIR = 'cricket'
+
+DRC_OBS_DIR = os.path.join('../../results','dirichletRefSeqDiagnosis','observables')
 DRC_MOD_DIR = 'dirichlet'
+
+
+ls = {'schlomilch':'--','cricket':'Canonical SLG','dirichlet':'-'}
+model_lab = {'schlomilch':'Microc. SLG','cricket':'Canonical SLG','dirichlet':'Microc. Dirichlet'}
+pheno_lab = {'H':'Healthy','U':'Unhealthy'}
 
 if True:
 
@@ -53,7 +61,7 @@ if True:
         cuts[1]:'Mid thr.$\\approx 10^{-5}$',
         cuts[2]:'High thr.$\\approx 10^{-4}$' }
 
-    replicas = config['model']['replicas']
+    replicas = 100# config['model']['replicas']
 
     lab  = plot_config.phenotype_legend(phen)
     col  = plot_config.phenotype_color(phen)
@@ -92,7 +100,9 @@ if True:
 
 
 R={}
-fig,ax=plt.subplots(nrows=len(Pheno['phenotype']),ncols=len(cuts),figsize=(25,15))
+
+x_cm,y_cm = 16,8
+fig,ax=plt.subplots(nrows=len(Pheno['phenotype']),ncols=len(cuts),figsize=(2.54*x_cm,2.54*y_cm))
 fig.patch.set_facecolor('#FFFFFF')
 
 for p,i in zip(['H','U'],range(len(Pheno['phenotype']))):
@@ -104,7 +114,7 @@ for p,i in zip(['H','U'],range(len(Pheno['phenotype']))):
     for c,j in zip(cuts,range(len(cuts))):
         
         if True:
-            ax[i,j].tick_params(axis='both', which='major', labelsize=40,length=25,width=4,direction='in')
+            ax[i,j].tick_params(axis='both', which='major', labelsize=40,length=25,width=4,direction='in',right=False,top=False,pad=15)
             
             for axis in ['bottom','left']:  
                 ax[i,j].spines[axis].set_linewidth(6)
@@ -112,25 +122,21 @@ for p,i in zip(['H','U'],range(len(Pheno['phenotype']))):
             for axis in ['right','top']:  
                 ax[i,j].spines[axis].set_visible(False)
             
-            ax[i,j].xaxis.set_major_locator(MaxNLocator(5)) 
+            ax[i,j].xaxis.set_major_locator(MaxNLocator(6)) 
+            ax[i,j].yaxis.set_major_locator(MaxNLocator(6)) 
         
-            ax[i,j].tick_params(right=False)
-            ax[i,j].tick_params(top=False)
-            ax[i,j].tick_params(axis='both', which='major', pad=15)
-
+            ax[i,j].xaxis.set_ticks(np.arange(0, 1.25, 0.25))
             ax[i,j].yaxis.set_ticks(np.arange(0, 1.25, 0.25))
-
+            
             if j>0:  ax[i,j].set_yticklabels([])
             else:    ax[i,j].yaxis.set_major_formatter(ticker.FormatStrFormatter('%0.2f'))
     
-            ax[i,j].xaxis.set_major_locator(MaxNLocator(6)) 
-            ax[i,j].yaxis.set_major_locator(MaxNLocator(6)) 
-    
+
         O_data = np.zeros(1)
         
         od=Pheno['X'][p][c]['binary mean']['original']
         
-        if True:
+        for m,D in zip(['schlomilch','cricket','dirichlet'],[SCH_OBS_DIR,CRI_OBS_DIR,DRC_OBS_DIR]):
 
             O_avg_s = pd.DataFrame(dtype=float)
 
@@ -140,8 +146,8 @@ for p,i in zip(['H','U'],range(len(Pheno['phenotype']))):
             
                 print(r)
                 
-                file = f'{c}_{p}_{r}.csv'
-                MX=pd.read_csv(os.path.join(SCH_OBS_DIR,file),index_col=0,header=[0, 1])
+                file = f'{c}_{p}_{r}.csv.zip'
+                MX=pd.read_csv(os.path.join(D,file),index_col=0,header=[0, 1],compression='gzip')
                             
                 om=MX['binary mean']['original']
 
@@ -162,50 +168,14 @@ for p,i in zip(['H','U'],range(len(Pheno['phenotype']))):
 
             A_s=pl.binning(x=pd.Series(O_data),y=pd.Series(O_model_s),n_bins=20)
             
-            r2=round(R[p].loc[c].mean(),3)
-            ax[i,j].text(fontsize=25,s='$R_{Sch.}^2$='+f'{r2}',x=0.675,y=0.35,bbox=box )
-            ax[i,j].errorbar(x=A_s['x_mean'],xerr=A_s['x_std'],y=A_s['y_mean'],yerr=A_s['y_std'],color=col['data'][p],**ebar,label='Schlomilch')
+            ax[i,j].errorbar(x=A_s['x_mean'],xerr=A_s['x_std'],y=A_s['y_mean'],yerr=A_s['y_std'],color=col[m][p],**ebar,label= model_lab[m])
+            x,y=np.random.uniform(0,1,10000),np.random.uniform(0,1,10000)
 
-        if True:
-
-            O_avg_d = pd.DataFrame(dtype=float)
-            O_model_d = np.zeros(1)
-            for r in range(replicas):
-            
-                print(r)
-                
-                file = f'{c}_{p}_{r}.csv'
-                MX=pd.read_csv(os.path.join(DRC_OBS_DIR,file),index_col=0,header=[0, 1])
-                            
-                om=MX['binary mean']['original']
-
-                O_d=pd.DataFrame(dtype=float)
-                O_d['d'],O_d['m']=od,om
-                O_avg_d[r]=om
-
-                O_d=O_d.dropna()
-
-                O_d=O_d.sort_values('d')
-                #ax[i,j].scatter(O_d['d'],O_d['m'],alpha=0.1,color=pl.complementary_rgb(col['data'][p]))
-                  
-                O_data=np.append(O_d['d'].values,O_data)
-                O_model_d=np.append(O_d['m'].values,O_model_d)
-                        
-            O_plt_d=pd.DataFrame()
-            O_plt_d['d'],O_plt_d['m']=O_d['d'],O_avg_d.mean(axis=1)
-            O_plt_d=O_plt_d.dropna()
-            ax[i][j].scatter(O_plt_d['d'],O_plt_d['m'],alpha=0.2,color='#848482')
-
-            A_d=pl.binning(x=pd.Series(O_data),y=pd.Series(O_model_d),n_bins=20)
-            
-            ax[i,j].errorbar(x=A_d['x_mean'],xerr=A_d['x_std'],y=A_d['y_mean'],yerr=A_d['y_std'],color=pl.complementary_rgb(col['data'][p]),label='Dirichlet',**ebar)
-
-               
         if i==1: 
             xticks_loc = ax[i,j].get_xticks().tolist()
             ax[i,j].xaxis.set_major_locator(mticker.FixedLocator(xticks_loc))
             ax[i,j].set_xticklabels(xticks_loc,fontsize=25,fontstyle='italic')
-            ax[i,j].set_title(S[c],fontsize=25)
+            ax[i,j].set_title(S[c],fontsize=35)
         else: 
             ax[i,j].set_xticklabels([]) 
 
@@ -216,22 +186,18 @@ for p,i in zip(['H','U'],range(len(Pheno['phenotype']))):
         else:
             ax[i,j].set_yticklabels([])        
 
-        if j==2:
-            ax[i,j].yaxis.set_label_position("right")
-            ax[i,j].set_ylabel(lab[p],rotation=270,labelpad=50,fontsize=45)
-
-        xi=np.linspace(-0.1,1.1)
+        xi=np.linspace(-0.2,1.1)
         ax[i][j].plot(xi,xi,color='black',ls='--',linewidth=3,zorder=3)
         
         ax[i][j].set_xlim(-0.2,1.2)
         ax[i][j].set_ylim(-0.2,1.2)
 
-ax[1,1].set_xlabel('Observed Occupancy, $\\overline{o}_{Data}$',fontsize=45)        
-ax[1,0].text(s='Observed Occupancy, $\\overline{o}_{Model}$',fontsize=45,rotation=90,x=-0.7,y=0.4)
+ax[1,1].set_xlabel('Observed Occupancy, $[\\overline{o}_{Data}]$',fontsize=50)        
+ax[1,0].text(s='Predicted Occupancy, $[\\overline{o}_{Model}]$',fontsize=50,rotation=90,x=-0.5,y=0.4)
       
-ax[0,0].legend(fontsize=25,numpoints=1 ,fancybox=True,shadow=True,loc=(0.45,0.1))
-ax[1,0].legend(fontsize=25,numpoints=1 ,fancybox=True,shadow=True,loc=(0.45,0.1))
+ax[0,2].legend(fontsize=25,numpoints=1 ,fancybox=True,shadow=True,loc=(0.45,0.1))
+ax[1,2].legend(fontsize=25,numpoints=1 ,fancybox=True,shadow=True,loc=(0.45,0.1))
 
-fig.savefig(os.path.join('../../plots/maintext',f'occupancy_scatter_{phen}_{engine}_{database}'), transparent=False, dpi=150,bbox_inches='tight')
+fig.savefig(os.path.join('../../plots/maintext',f'occupancy_scatter_{phen}_{engine}_{database}.pdf'), transparent=False, dpi=150,bbox_inches='tight')
 
 print('done')
