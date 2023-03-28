@@ -34,6 +34,7 @@ data/metadata/aggregated/run2.txt
 data/model
 data/observables
 data/configurations
+workflow/patterns2
+workflow/maintext/old
 ##############################
 ### DELETE SECTION
-workflow/maintext/model_lego.py
