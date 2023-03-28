@@ -1,0 +1,8 @@
+{"data": {
+    "engine":"kaiju",
+    "phenotype":"diagnosis",
+    "database":"RefSeq",
+    "protocol":"relative_abundance",
+    "scale":"original",
+    "cuts":[4.5e-07,9.0e-06, 0.00018]}
+}

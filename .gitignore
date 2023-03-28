@@ -36,5 +36,6 @@ data/observables
 data/configurations
 workflow/patterns2
 workflow/maintext/old
+workflow/patterns
 ##############################
 ### DELETE SECTION
